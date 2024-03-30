@@ -5,6 +5,14 @@
 #include <string.h>
 #include <ctype.h>
 
+Database db_create()
+{
+    struct database
+    {
+        /* data */
+    };
+}
+
 void db_append(Database *db, Record const *item)
 {
 
@@ -103,13 +111,13 @@ Record parse_record(char *line)
     // puts("strtok works");
 
     // Define record fields
-    char handle[32], comment[64];
-    long unsigned int followers, date_last_modified;
+    // char handle[32], comment[64];
+    // long unsigned int followers, date_last_modified;
     char *endpointer = " ";
     int argc = 0;
     // puts("while loop starting");
 
-    size_t token_len = 1;
+    // size_t token_len = 1;
     Record *new_record = (Record *)malloc(sizeof(Record));
     // Assign values
     while (token != NULL)
@@ -204,15 +212,12 @@ void db_write_csv(Database *db, char const *path)
     {
         // Edit the fprintf
         struct Record *my_record = (db->records + i);
-        char date_last_modified[64];
-        strftime(date_last_modified, sizeof(date_last_modified), "%Y-%m-%d %H:%M", my_record->date_last_modified);
         fprintf(file, "%s,%li,%s,%s\n", my_record->handle, my_record->followers, my_record->comment, date_last_modified);
     }
 
     fclose(file);
 }
-
-int main()
+/*int main()
 {
     Record *point = (Record *)malloc(4 * sizeof(Record));
     struct Database hello = {point, 0, 4};
@@ -236,3 +241,4 @@ int main()
     printf("size: %d and cap: %d\n", hello.size, hello.capacity);
     print_record(db_index(&hello, 6));
 }
+*/
