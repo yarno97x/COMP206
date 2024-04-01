@@ -7,30 +7,28 @@
 
 Database db_create()
 {
-    struct database
-    {
-        /* data */
-    };
+    Record *point = (Record *)malloc(4 * sizeof(Record));
+    struct Database new_db = {point, 0, 4};
+    return new_db;
 }
 
 void db_append(Database *db, Record const *item)
 {
-
     if (db->size == 0)
     {
-        puts("Creating first entry...");
+        // puts("Creating first entry...");
         *(db->records) = *item;
     }
     else if (db->size < db->capacity)
     {
-        puts("Size < Capacity. Appending...");
+        // puts("Size < Capacity. Appending...");
 
         // Treat size as index
         *(db->records + db->size) = *item;
     }
     else
     {
-        puts("Array is too small. Resizing...");
+        // puts("Array is too small. Resizing...");
 
         // Resize to double
         db->capacity *= 2;
@@ -48,7 +46,7 @@ void db_append(Database *db, Record const *item)
     }
 
     db->size++;
-    printf("New size: %d\n", db->size);
+    // printf("New size: %d\n", db->size);
     return;
 }
 
@@ -71,7 +69,7 @@ Record *db_lookup(Database *db, char const *handle)
             return (db->records + i);
         }
     }
-    puts("Handle not found");
+    // puts("Handle not found");
     return NULL;
 }
 
@@ -83,7 +81,7 @@ void db_free(Database *db)
 
 void print_record(Record const *r)
 {
-    printf("%s %s %ld %ld\n", r->handle, r->comment, r->followers, r->date_last_modified);
+    printf("%s %s %li %li\n", r->handle, r->comment, r->followers, r->date_last_modified);
 }
 
 Record parse_record(char *line)
@@ -99,7 +97,7 @@ Record parse_record(char *line)
     // Define an error record
     Record ERROR = (Record){
         .handle = "@Error_Record",
-        .comment = "Error",
+        .comment = "Error adding this record",
         .followers = 0,
         .date_last_modified = 0,
     };
@@ -122,7 +120,6 @@ Record parse_record(char *line)
     // Assign values
     while (token != NULL)
     {
-        token_len = strlen(token);
 
         switch (argc)
         {
@@ -160,17 +157,17 @@ Record parse_record(char *line)
     // puts("checking if # of args is ok");
     if (argc != 4)
     {
-        puts("Invalid number of args");
+        //    puts("Invalid number of args");
         return ERROR;
     }
     // puts("checking if too many args");
     if (token != NULL)
     {
-        puts("Invalid CSV format");
+        //    puts("Invalid CSV format");
         return ERROR;
     }
-    puts(" ");
-    print_record(new_record);
+    // puts(" ");
+    // print_record(new_record);
 
     return *new_record;
 }
@@ -191,11 +188,10 @@ void db_load_csv(Database *db, char const *path)
     {
         nread = getline(&line, &size, file);
         Record new_rec = parse_record(line);
-        if (!strcmp(new_rec.handle, "@Error_record"))
+        if (strcmp(new_rec.comment, "Error adding this record"))
         {
-            continue;
+            db_append(db, &new_rec);
         }
-        db_append(db, &new_rec);
         line = NULL;
     } while (nread != -1);
     free(line);
@@ -212,7 +208,7 @@ void db_write_csv(Database *db, char const *path)
     {
         // Edit the fprintf
         struct Record *my_record = (db->records + i);
-        fprintf(file, "%s,%li,%s,%s\n", my_record->handle, my_record->followers, my_record->comment, date_last_modified);
+        fprintf(file, "%s,%li,%s,%li\n", my_record->handle, my_record->followers, my_record->comment, my_record->date_last_modified);
     }
 
     fclose(file);
